@@ -33,7 +33,7 @@ jobs:
       with:
           text: A successful scrape!
           attachments: |
-          [
+            [
               {
               "color": "good",
               "author_name": "${{ github.actor }}",
@@ -49,7 +49,7 @@ jobs:
                   }
               ]
               }
-          ] 
+            ] 
     - name: Slack Notification on FAILURE
       if: failure()
       uses: tokorom/action-slack-incoming-webhook@main
