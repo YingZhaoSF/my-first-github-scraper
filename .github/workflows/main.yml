@@ -14,11 +14,20 @@ jobs:
       run: pipx install pipenv
     - uses: actions/setup-python@v2
       with:
+        python-version: '3.9'
         cache: 'pipenv'
     - run: pipenv install jupyter requests bs4 --python `which python`
     - name: Run scraper
       run: pipenv run jupyter execute scrape.ipynb
-    - name: Add and commit
+    - name: Add and commit	
+      run: |-	
+        git add .	
+        git config user.name "Automated"	
+        git config user.email "actions@users.noreply.github.com"	
+        git commit -m "Latest data" 	
+    - name: Push	
+      run: git push
+        - name: Add and commit
       id: add_commit
       uses: EndBug/add-and-commit@v8
       with:
@@ -33,7 +42,7 @@ jobs:
       with:
           text: A successful scrape!
           attachments: |
-            [
+          [
               {
               "color": "good",
               "author_name": "${{ github.actor }}",
@@ -49,7 +58,7 @@ jobs:
                   }
               ]
               }
-            ] 
+          ] 
     - name: Slack Notification on FAILURE
       if: failure()
       uses: tokorom/action-slack-incoming-webhook@main
@@ -71,3 +80,10 @@ jobs:
               ]
               }
           ] 
+    - name: Slack Notification on no new commits
+      if: s(success() & steps.add_commit.outputs.committed=='false')
+      uses: tokorom/action-slack-incoming-webhook@main
+      env:
+        INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      with:
+        text: Nothing was committed
